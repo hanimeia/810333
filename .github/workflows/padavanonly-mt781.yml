@@ -1,4 +1,4 @@
-name: Build mt7981 hanwckf/immortalwrt-798x_luci-app-mtk
+name: Build mt7981 padavanonly/immortalwrt-mt798x-24.10
 
 # Controls when the action will run. Workflow runs when manually triggered using the UI
 # or API.
@@ -6,8 +6,8 @@ on:
   workflow_dispatch:
       
 env:
-  REPO_URL: https://github.com/hanwckf/immortalwrt-mt798x.git
-  REPO_BRANCH: openwrt-21.02
+  REPO_URL: https://github.com/padavanonly/immortalwrt-mt798x-24.10.git
+  REPO_BRANCH: 2410
   TZ: Asia/Shanghai
   FEEDS_CONF: feeds.conf.default
 
@@ -28,6 +28,7 @@ jobs:
       env:
         DEBIAN_FRONTEND: noninteractive
       run: |
+        sudo -E apt update
         sudo -E apt-get -qq install ack antlr3 asciidoc autoconf automake autopoint binutils bison build-essential \
           bzip2 ccache clang clangd cmake cpio curl device-tree-compiler ecj fastjar flex gawk gettext gcc-multilib \
           g++-multilib git gperf haveged help2man intltool lib32gcc-s1 libc6-dev-i386 libelf-dev libglib2.0-dev \
@@ -58,7 +59,8 @@ jobs:
 
     - name: Load custom config
       run: |
-        cp -f ./luci-app-mtk-deprecated/mt7981-ax3000.config .config
+        cd openwrt
+        cp -f ./defconfig/mt7981-ax3000.config .config
         
     - name: Download package
       id: package
@@ -85,7 +87,7 @@ jobs:
       uses: actions/upload-artifact@main
       if: steps.compile.outputs.status == 'success' && !cancelled()
       with:
-        name: ImmortalWrt_luci-app-mtk_bin_${{ env.REPO_HEAD }}
+        name: ImmortalWrt_padavanonly_bin_${{ env.REPO_HEAD }}
         path: openwrt/bin
 
     - name: Organize files
@@ -101,16 +103,16 @@ jobs:
       uses: actions/upload-artifact@main
       if: steps.organize.outputs.status == 'success' && !cancelled()
       with:
-        name: ImmortalWrt_luci-app-mtk_${{ env.REPO_HEAD }}
+        name: ImmortalWrt_padavanonly_firmware_${{ env.REPO_HEAD }}
         path: ${{ env.FIRMWARE }}
         
     - name: Generate release tag
       id: tag
       if: steps.compile.outputs.status == 'success' && !cancelled()
       run: |
-        echo "release_tag=ImmortalWrt_luci-app-mtk_${{ env.REPO_HEAD }}" >> $GITHUB_OUTPUT
+        echo "release_tag=ImmortalWrt_padavanonly_${{ env.REPO_HEAD }}" >> $GITHUB_OUTPUT
         touch release.txt
-        echo "ImmortalWrt_luci-app-mtk_${{ env.REPO_HEAD }}" >> release.txt
+        echo "ImmortalWrt_padavanonly_${{ env.REPO_HEAD }}" >> release.txt
         echo "status=success" >> $GITHUB_OUTPUT
 
     - name: Upload firmware to release
