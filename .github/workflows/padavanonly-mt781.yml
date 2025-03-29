@@ -46,7 +46,7 @@ jobs:
       run: |
         echo "Free space:"
         df -hT $PWD
-        git clone $REPO_URL --depth=1 --single-branch --brunch $REPO_BRANCH openwrt
+        git clone $REPO_URL --depth=1 --single-branch --branch $REPO_BRANCH openwrt
         ln -sf /srcdir/openwrt $GITHUB_WORKSPACE/openwrt
         echo "REPO_HEAD=_$(git ls-remote $REPO_URL HEAD | head -c7)" >> $GITHUB_ENV
         
